@@ -1,5 +1,5 @@
-import { SyntaxKind } from 'typescript'
-import { parseTypes, parseName, astToOas3Type } from './parse'
+import { SyntaxKind, JsxEmit } from 'typescript'
+import { parseTypes, parseName, parseData, astToOas3Type } from './parse'
 
 interface mockTestData {
   member: {
@@ -8,7 +8,7 @@ interface mockTestData {
       text?: string
     }
     type?: {
-      kind: SyntaxKind
+      kind: SyntaxKind | undefined
       typeName?: {
         escapedText?: string
       }
@@ -18,6 +18,27 @@ interface mockTestData {
     }
   }
 }
+
+describe('Parse data', () => {
+  it('returns the parsed values', () => {
+    const expected = {
+      name: 'name',
+      types: ['boolean']
+    }
+    const testData: mockTestData = {
+      member: {
+        name: {
+          escapedText: 'name'
+        },
+        type: {
+          kind: SyntaxKind.BooleanKeyword
+        }
+      }
+    }
+    const result = parseData(testData.member)
+    expect(result).toEqual(expected)
+  })
+})
 
 describe('Parse variable name', () => {
   it('with underscores', () => {
@@ -60,8 +81,8 @@ describe('Parse type for', () => {
     ['SyntaxKind.BooleanKeyword', astToOas3Type.BooleanKeyword, SyntaxKind.BooleanKeyword],
     ['SyntaxKind.StringKeyword', astToOas3Type.StringKeyword, SyntaxKind.StringKeyword],
     ['SyntaxKind.NumberKeyword', astToOas3Type.NumberKeyword, SyntaxKind.NumberKeyword],
-    ['SyntaxKind.ObjectKeyword', astToOas3Type.ObjectKeyword, SyntaxKind.ObjectKeyword],
-    ['SyntaxKind.ArrayType', astToOas3Type.ArrayType, SyntaxKind.ArrayType]
+    ['SyntaxKind.ArrayType', astToOas3Type.ArrayType, SyntaxKind.ArrayType],
+    ['SyntaxKind.TypeLiteral', astToOas3Type.TypeLiteral, SyntaxKind.TypeLiteral]
   ])('%s value returns array with only %s type', (_, expected, type) => {
     const testData: mockTestData = {
       member: {
@@ -77,18 +98,21 @@ describe('Parse type for', () => {
     expect(result![0]).toEqual(expected)
   })
 
-  it('SyntaxKind.AnyKeyword value returns type', () => {
+  it.each([
+    ['SyntaxKind.AnyKeyword', SyntaxKind.AnyKeyword, undefined],
+    ['SyntaxKind.ObjectKeyword', SyntaxKind.ObjectKeyword, undefined]
+  ])('%s value returns %s', (_, type, expected) => {
     const testData: mockTestData = {
       member: {
         type: {
-          kind: SyntaxKind.AnyKeyword
+          kind: type
         }
       }
     }
 
     const result = parseTypes(testData.member)
 
-    expect(result).toBe(undefined)
+    expect(result).toBe(expected)
   })
 
   it('SyntaxKind.TypeReference value returns undefined', () => {
@@ -130,6 +154,21 @@ describe('Parse type for', () => {
     const result = parseTypes(testData.member)
 
     expect(result).toHaveLength(2)
+    expect(result).toEqual(expected)
+  })
+
+  it('Non handled value returns undefined', () => {
+    const expected = undefined
+    const testData: mockTestData = {
+      member: {
+        type: {
+          kind: -1
+        }
+      }
+    }
+
+    const result = parseTypes(testData.member)
+
     expect(result).toEqual(expected)
   })
 })

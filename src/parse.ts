@@ -6,8 +6,8 @@ type astToOas3Type = {
   BooleanKeyword: string
   StringKeyword: string
   NumberKeyword: string
-  ObjectKeyword: string
   ArrayType: string
+  TypeLiteral: string
   TypeReference: string
   UnionType: string
   UndefinedKeyword: string
@@ -18,17 +18,25 @@ export const astToOas3Type: astToOas3Type = {
   BooleanKeyword: 'boolean',
   StringKeyword: 'string',
   NumberKeyword: 'number',
-  ObjectKeyword: 'object',
   ArrayType: 'array',
+  TypeLiteral: 'object',
   TypeReference: 'type',
   UnionType: 'multiple',
   UndefinedKeyword: 'undefined'
 }
 
+type typeData = {
+  name: string,
+  type: string
+}
+
 export const parseName = (member: any) => member.name.escapedText || member.name.text
 
+export const getKind = (member: any) => member?.elementType?.kind || member?.type?.kind
+
 export const parseTypes = (member: any): Array<string> | undefined => {
-  let type = astToOas3Type[SyntaxKind[member.type.kind]]
+  const kind = getKind(member)
+  let type = astToOas3Type[SyntaxKind[kind]]
 
   if (type === astToOas3Type.TypeReference) {
     type = member.type.typeName.escapedText
@@ -37,7 +45,17 @@ export const parseTypes = (member: any): Array<string> | undefined => {
   } else if (type === astToOas3Type.AnyKeyword) {
     console.log('Type any is not allowed, plese be more specific.')
     return undefined
+  } else if (!type) {
+    console.log(`Type not found for kind ${SyntaxKind[kind]}.`)
+    return undefined
   }
 
   return [type]
+}
+
+export const parseData = (member: any) => {
+  return {
+    name: parseName(member),
+    types: parseTypes(member)
+  }
 }
