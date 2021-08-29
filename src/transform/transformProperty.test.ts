@@ -2,6 +2,7 @@ import transformRef from './transformRef'
 import transformObject from './transformObject'
 import transformArray from './transformArray'
 import transformProperty from './transformProperty'
+import mockTransform from './mockTransform'
 
 const mockReferenceResult = {
   '$ref': '#/components/schemas/type'
@@ -18,9 +19,6 @@ const mockArrayResult = {
   type: 'array',
   items: {}
 }
-
-// TODO: Move to jest configuration
-const mockTransform = { schemaTypes: [], parseData: () => {}, parseTypes: () => {} }
 
 jest.mock('./transformRef', () => jest.fn(() => mockReferenceResult))
 jest.mock('./transformObject', () => jest.fn(() => mockObjectResult))

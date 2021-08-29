@@ -1,10 +1,8 @@
 import transformProperty from './transformProperty'
 import transformObject from './transformObject'
+import mockTransform from './mockTransform'
 
 const mockPropertyResult = 'type'
-
-// TODO: Move to jest configuration
-const mockTransform = { schemaTypes: [], parseData: () => {}, parseTypes: () => {} }
 
 jest.mock('./transformProperty', () => jest.fn(() => mockPropertyResult))
 

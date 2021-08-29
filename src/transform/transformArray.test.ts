@@ -1,5 +1,6 @@
 import transformObject from './transformObject'
 import transformArray from './transformArray'
+import mockTransform from './mockTransform'
 
 const mockObjectResult = {
   type: 'object',
@@ -7,9 +8,6 @@ const mockObjectResult = {
     name: 'type'
   }
 }
-
-// TODO: Move to jest configuration
-const mockTransform = { schemaTypes: [], parseData: () => {}, parseTypes: () => {} }
 
 jest.mock('./transformObject', () => jest.fn(() => mockObjectResult))
 
