@@ -75,6 +75,6 @@
   ],
   "exclude": [
     "node_modules",
-    "**.*.test.{ts|js}"
+    "src/**/*.test.ts"
   ]
 }
