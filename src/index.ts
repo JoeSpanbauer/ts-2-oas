@@ -23,5 +23,5 @@ module.exports = (fileText: string) => {
       schemas[schemaName] = schema
     })
 
-    return JSON.stringify(schemas)
+    return schemas
 }
