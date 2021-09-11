@@ -1,6 +1,9 @@
+import transformRef from './transformRef'
 import transformObject from './transformObject'
 import transformArray from './transformArray'
 import mockTransform from './mockTransform'
+
+const mockRefResult = { $ref: '#/components/schemas/SchemaType'}
 
 const mockObjectResult = {
   type: 'object',
@@ -9,10 +12,29 @@ const mockObjectResult = {
   }
 }
 
+jest.mock('./transformRef', () => jest.fn(() => mockRefResult))
 jest.mock('./transformObject', () => jest.fn(() => mockObjectResult))
 
 describe('Transform data into', () => {
+  it('an array of complex type (schema)', () => {
+    jest.clearAllMocks()
+    const expected = {
+      type: 'array',
+      items: mockRefResult
+    }
+    const object = {
+      elementType: {
+        members: undefined
+      }
+    }
+    const transform = { ...mockTransform, schemaTypes: ['SchemaType'], parseTypes: () => ['SchemaType'] }
+    const result = transformArray(object, transform)
+    expect(transformRef).toHaveBeenCalledTimes(1)
+    expect(result).toStrictEqual(expected)
+  })
+  
   it('an array of complex type (object)', () => {
+    jest.clearAllMocks()
     const expected = {
       type: 'array',
       items: { ...mockObjectResult }

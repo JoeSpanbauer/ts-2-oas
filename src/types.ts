@@ -6,6 +6,7 @@ interface AllTypes {
   number: number
   stringArray: string[]
   allTypes: AllTypes
+  optionalTypesArray: OptionalTypes[]
   variable_with_underscores: string
   'variable-with-hyphens': string
   'variable with spaces': string

@@ -39,7 +39,7 @@ export const parseTypes = (member: any): Array<string> | undefined => {
   let type = astToOas3Type[SyntaxKind[kind]]
 
   if (type === astToOas3Type.TypeReference) {
-    type = member.type.typeName.escapedText
+    type = member?.type?.typeName?.escapedText || member?.elementType?.typeName?.escapedText
   } else if (type === astToOas3Type.UnionType) {
     return member.type.types.map((t: any) => astToOas3Type[SyntaxKind[t.kind]])
   } else if (type === astToOas3Type.AnyKeyword) {

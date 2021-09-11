@@ -1,3 +1,4 @@
+import transformRef from './transformRef'
 import createObject from './transformObject'
 
 export default (object: any, transforms: transforms) => {
@@ -5,9 +6,14 @@ export default (object: any, transforms: transforms) => {
   if (object.elementType.members) {
     items = createObject(object.elementType, transforms)
   } else {
-    const { parseTypes } = transforms
-    items = {
-      type: parseTypes(object)
+    const { schemaTypes, parseTypes } = transforms
+    const types = parseTypes(object)
+    if (schemaTypes.includes(types[0])) {
+      items = transformRef(types[0])
+    } else {
+      items = {
+        type: types
+      }
     }
   }
 
