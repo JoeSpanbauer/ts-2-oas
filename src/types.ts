@@ -15,6 +15,7 @@ interface AllTypes {
   custom: {
     int: number
   }
+  date: Date
   special: {
     type: string
   }[]
