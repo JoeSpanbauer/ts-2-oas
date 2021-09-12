@@ -1,13 +1,12 @@
 import transformProperty from './transformProperty'
 
 const transformObject = (object: any, transforms: transforms) => {
-  let obj: any
-  const { parseData } = transforms
-  const members = object?.members || object?.type?.members
-  obj = {
+  const obj = {
     type: 'object',
     properties: {}
   }
+  const { parseData } = transforms
+  const members = object?.members || object?.type?.members
 
   members?.forEach((m: any) => {
     const { name, types } = parseData(m)

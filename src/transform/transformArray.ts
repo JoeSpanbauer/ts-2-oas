@@ -24,7 +24,7 @@ export default (object: any, transforms: transforms) => {
       items = transformRef(types[0])
     } else {
       items = {
-        type: types
+        type: types.length === 1 ? types[0] : types
       }
     }
   }

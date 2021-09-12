@@ -98,7 +98,6 @@ describe('Transform data into', () => {
     }
     const transform = { ...mockTransform, schemaTypes: ['SchemaType'], parseTypes: () => ['string', 'number'] }
     const result = transformArray(object, transform)
-    // expect(transformRef).toHaveBeenCalledTimes(1)
     expect(result).toStrictEqual(expected)
   })
 })

@@ -94,7 +94,7 @@ describe('Transform data into', () => {
     expect(result).toStrictEqual(expected)
   })
   
-  it('multiple types with a complext type (object)', () => {
+  it('multiple types with a complex type (object)', () => {
     const expected = {
       anyOf: [
         mockObjectResult, 
@@ -111,7 +111,7 @@ describe('Transform data into', () => {
     expect(result).toStrictEqual(expected)
   })
   
-  it('multiple types with a complext type (array)', () => {
+  it('multiple types with a complex type (array)', () => {
     const expected = {
       anyOf: [
         mockArrayResult, 
