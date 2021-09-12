@@ -2,3 +2,5 @@
 /dist
 /coverage
 .vscode
+/src/testOutput.js
+/src/output.json

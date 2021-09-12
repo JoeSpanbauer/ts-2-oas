@@ -5,7 +5,7 @@ import transformProperty from './transformProperty'
 import mockTransform from './mockTransform'
 
 const mockReferenceResult = {
-  '$ref': '#/components/schemas/type'
+  '$ref': '#/components/schemas/SchemaType'
 }
 
 const mockObjectResult = {
@@ -25,16 +25,17 @@ jest.mock('./transformObject', () => jest.fn(() => mockObjectResult))
 jest.mock('./transformArray', () => jest.fn(() => mockArrayResult))
 
 describe('Transform data into', () => {
-  it('a reference type', () => {
-    const transforms: transforms = { ...mockTransform, schemaTypes: ['type'] }
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
 
-    const result = transformProperty(undefined, ['type'], transforms)
+  it('a reference type', () => {
+    const transforms = { ...mockTransform, schemaTypes: ['SchemaType'] }
+
+    const result = transformProperty(undefined, ['SchemaType'], transforms)
     expect(transformRef).toHaveBeenCalledTimes(1)
     expect(result).toBe(mockReferenceResult)
   })
-
-  // TODO: Implement this
-  it.todo('multiple reference types')
 
   it('an object', () => {
     const mockMember = {
@@ -45,9 +46,6 @@ describe('Transform data into', () => {
     expect(result).toBe(mockObjectResult)
   })
 
-  // TODO: Implement this
-  it.todo('multiple object types')
-
   it('an array', () => {
     const mockMember = {
       type: undefined
@@ -56,9 +54,6 @@ describe('Transform data into', () => {
     expect(transformArray).toHaveBeenCalledTimes(1)
     expect(result).toBe(mockArrayResult)
   })
-
-  // TODO: Implement this
-  it.todo('multiple array types')
 
   it('a single type', () => {
     const expected = {
@@ -70,13 +65,66 @@ describe('Transform data into', () => {
     expect(result).toStrictEqual(expected)
   })
   
-  it('multiple types', () => {
+  it('multiple basic types', () => {
     const expected = {
       type: ['type1', 'type2']
     }
     const types = ['type1', 'type2']
 
     const result = transformProperty(undefined, types, mockTransform)
+    expect(result).toStrictEqual(expected)
+  })
+  
+  it('multiple types with a complex type (schema)', () => {
+    const expected = {
+      anyOf: [
+        {
+          $ref: "#/components/schemas/SchemaType",
+        }, 
+        {
+          type: 'type2'
+        }
+      ]
+    }
+    const types = ['SchemaType', 'type2']
+
+    const transorms = { ...mockTransform, schemaTypes: ['SchemaType'], parseTypes: () => ['SchemaType', 'type2'] }
+    const result = transformProperty(undefined, types, transorms)
+    expect(transformRef).toHaveBeenCalledTimes(1)
+    expect(result).toStrictEqual(expected)
+  })
+  
+  it('multiple types with a complex type (object)', () => {
+    const expected = {
+      anyOf: [
+        mockObjectResult, 
+        {
+          type: 'type2'
+        }
+      ]
+    }
+    const types = ['object', 'type2']
+
+    const transorms = { ...mockTransform, parseTypes: () => ['object', 'type2'] }
+    const result = transformProperty(undefined, types, transorms)
+    expect(transformObject).toHaveBeenCalledTimes(1)
+    expect(result).toStrictEqual(expected)
+  })
+  
+  it('multiple types with a complex type (array)', () => {
+    const expected = {
+      anyOf: [
+        mockArrayResult, 
+        {
+          type: 'type2'
+        }
+      ]
+    }
+    const types = ['array', 'type2']
+
+    const transorms = { ...mockTransform, parseTypes: () => ['array', 'type2'] }
+    const result = transformProperty(undefined, types, transorms)
+    expect(transformArray).toHaveBeenCalledTimes(1)
     expect(result).toStrictEqual(expected)
   })
 })

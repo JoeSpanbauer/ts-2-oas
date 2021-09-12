@@ -63,4 +63,41 @@ describe('Transform data into', () => {
     const result = transformArray(object, transform)
     expect(result).toStrictEqual(expected)
   })
+
+  it('an array with a schema type', () => {
+    jest.clearAllMocks()
+    const expected = {
+      type: 'array',
+      items: {
+        anyOf: [mockRefResult, { type: 'undefined' }]
+      }
+    }
+    const object = {
+      elementType: {
+        members: undefined
+      }
+    }
+    const transform = { ...mockTransform, schemaTypes: ['SchemaType'], parseTypes: () => ['SchemaType', 'undefined'] }
+    const result = transformArray(object, transform)
+    expect(transformRef).toHaveBeenCalledTimes(1)
+    expect(result).toStrictEqual(expected)
+  })
+
+  it('an array with a basic type', () => {
+    jest.clearAllMocks()
+    const expected = {
+      type: 'array',
+      items: {
+        anyOf: [{ type: 'string' }, { type: 'number' }]
+      }
+    }
+    const object = {
+      elementType: {
+        members: undefined
+      }
+    }
+    const transform = { ...mockTransform, schemaTypes: ['SchemaType'], parseTypes: () => ['string', 'number'] }
+    const result = transformArray(object, transform)
+    expect(result).toStrictEqual(expected)
+  })
 })
