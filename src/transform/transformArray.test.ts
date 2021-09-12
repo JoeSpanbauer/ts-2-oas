@@ -83,7 +83,7 @@ describe('Transform data into', () => {
     expect(result).toStrictEqual(expected)
   })
 
-  it('an array with a basic types', () => {
+  it('an array with a basic type', () => {
     jest.clearAllMocks()
     const expected = {
       type: 'array',
