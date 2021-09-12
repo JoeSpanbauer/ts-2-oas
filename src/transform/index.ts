@@ -1,3 +1,3 @@
-import createObject from './transformObject'
+import transformObject from './transformObject'
 
-export default (statement: any, transforms: transforms) => createObject(statement, transforms)
+export default (statement: any, transforms: transforms) => transformObject(statement, transforms)

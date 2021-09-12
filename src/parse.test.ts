@@ -1,7 +1,7 @@
 import { SyntaxKind, JsxEmit } from 'typescript'
-import { parseTypes, parseName, parseData, astToOas3Type } from './parse'
+import { parseStatements, parseTypes, parseName, parseData, astToOas3Type } from './parse'
 
-interface mockTestData {
+interface mockMemberData {
   member: {
     name?: {
       escapedText?: string
@@ -19,13 +19,47 @@ interface mockTestData {
   }
 }
 
+interface mockStatementData {
+  body: {
+    statements: mockStatementData[]
+  }
+}
+
+describe('Parse statments', () => {
+  it('returns the top level statements', () => {
+    const testData = [{}, {}, {}]
+    const results = parseStatements(testData)
+    expect(results).toHaveLength(3)
+  })
+
+  it('returns nested statements', () => {
+    const testData = [{
+      body: {
+        statements: [{}]
+      }
+    }]
+    const results = parseStatements(testData)
+    expect(results).toHaveLength(1)
+  })
+
+  it('restuns both top and nested statements', () => {
+    const testData = [{}, {
+      body: {
+        statements: [{}]
+      }
+    }]
+    const results = parseStatements(testData)
+    expect(results).toHaveLength(2)
+  })
+})
+
 describe('Parse data', () => {
   it('returns the parsed values', () => {
     const expected = {
       name: 'name',
       types: ['boolean']
     }
-    const testData: mockTestData = {
+    const testData: mockMemberData = {
       member: {
         name: {
           escapedText: 'name'
@@ -43,7 +77,7 @@ describe('Parse data', () => {
 describe('Parse variable name', () => {
   it('with underscores', () => {
     const variable = 'variable_with_underscores'
-    const testData: mockTestData = {
+    const testData: mockMemberData = {
       member: {
         name: {
           escapedText: variable
@@ -61,7 +95,7 @@ describe('Parse variable name', () => {
     ['with spaces', 'variable with spaces'],
     ['with special characters', 'variable with $pecial character'],
   ])('%s', (_, variable) => {
-    const testData: mockTestData = {
+    const testData: mockMemberData = {
       member: {
         name: {
           text: variable
@@ -84,7 +118,7 @@ describe('Parse type for', () => {
     ['SyntaxKind.ArrayType', astToOas3Type.ArrayType, SyntaxKind.ArrayType],
     ['SyntaxKind.TypeLiteral', astToOas3Type.TypeLiteral, SyntaxKind.TypeLiteral]
   ])('%s value returns array with only %s type', (_, expected, type) => {
-    const testData: mockTestData = {
+    const testData: mockMemberData = {
       member: {
         type: {
           kind: type
@@ -98,11 +132,29 @@ describe('Parse type for', () => {
     expect(result![0]).toEqual(expected)
   })
 
+  it('Date type to be string', () => {
+    const testData: mockMemberData = {
+      member: {
+        type: {
+          kind: SyntaxKind.TypeReference,
+          typeName: {
+            escapedText: 'Date'
+          }
+        }
+      }
+    }
+
+    const result = parseTypes(testData.member)
+
+    expect(result).toHaveLength(1)
+    expect(result![0]).toEqual('string')
+  })
+
   it.each([
     ['SyntaxKind.AnyKeyword', SyntaxKind.AnyKeyword, undefined],
     ['SyntaxKind.ObjectKeyword', SyntaxKind.ObjectKeyword, undefined]
   ])('%s value returns %s', (_, type, expected) => {
-    const testData: mockTestData = {
+    const testData: mockMemberData = {
       member: {
         type: {
           kind: type
@@ -117,7 +169,7 @@ describe('Parse type for', () => {
 
   it('SyntaxKind.TypeReference value returns undefined', () => {
     const expected = ['TypeName']
-    const testData: mockTestData = {
+    const testData: mockMemberData = {
       member: {
         type: {
           kind: SyntaxKind.TypeReference,
@@ -135,7 +187,7 @@ describe('Parse type for', () => {
 
   it('SyntaxKind.UnionType value returns array of types', () => {
     const expected = ['boolean', 'undefined']
-    const testData: mockTestData = {
+    const testData: mockMemberData = {
       member: {
         type: {
           kind: SyntaxKind.UnionType,
@@ -159,7 +211,7 @@ describe('Parse type for', () => {
 
   it('Non handled value returns undefined', () => {
     const expected = undefined
-    const testData: mockTestData = {
+    const testData: mockMemberData = {
       member: {
         type: {
           kind: -1

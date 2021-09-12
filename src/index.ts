@@ -1,10 +1,11 @@
 import ts from 'typescript'
 
-import { parseName, parseData, parseTypes } from './parse'
+import { parseName, parseStatements, parseData, parseTypes } from './parse'
 import createSchema from './transform'
 
 module.exports = (fileText: string) => {
-    const { statements } = ts.createSourceFile('test.ts', fileText, ts.ScriptTarget.Latest, false, ts.ScriptKind.TS)
+    const { statements: rootStatements } = ts.createSourceFile('test.ts', fileText, ts.ScriptTarget.Latest, false, ts.ScriptKind.TS)
+    const statements = parseStatements(rootStatements)
     const schemas = {}
   
     // Collect array of object types

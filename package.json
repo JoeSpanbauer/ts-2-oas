@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "genOutput": "npm run build && node src/testOutput.js",
     "test": "jest --verbose --coverage",
     "lint": "tsc --noEmit && eslint \"**/*.ts\" --quiet --fix",
     "build": "tsc --build",
@@ -35,6 +36,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.1",
     "jest": "^27.0.6",
+    "json-beautify": "^1.1.1",
     "prettier": "2.3.2",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1"

@@ -30,7 +30,20 @@ type typeData = {
   type: string
 }
 
-export const parseName = (member: any) => member.name.escapedText || member.name.text
+export const parseStatements = (_statements: any) => {
+  let statements: any[] = []
+  _statements.forEach((statement: any) => {
+    if (statement?.body?.statements) {
+      statements = statements.concat(parseStatements(statement?.body?.statements))
+    } else {
+      statements.push(statement)
+    }
+  })
+
+  return statements
+}
+
+export const parseName = (member: any) => member?.name?.escapedText || member?.name?.text
 
 export const getKind = (member: any) => member?.elementType?.kind || member?.type?.kind
 
@@ -40,11 +53,14 @@ export const parseTypes = (member: any): Array<string> | undefined => {
 
   if (type === astToOas3Type.TypeReference) {
     type = member?.type?.typeName?.escapedText || member?.elementType?.typeName?.escapedText
-    if (type === "Date") {
+    if (type === 'Date') {
       type = 'string'
     }
   } else if (type === astToOas3Type.UnionType) {
-    return member.type.types.map((t: any) => astToOas3Type[SyntaxKind[t.kind]])
+    return member.type.types.map((t: any) => {
+      const result = astToOas3Type[SyntaxKind[t.kind]]
+      return result === 'type' ? t.typeName.escapedText : result
+    })
   } else if (type === astToOas3Type.AnyKeyword) {
     console.log('Type any is not allowed, plese be more specific.')
     return undefined
