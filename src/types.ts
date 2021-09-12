@@ -37,4 +37,6 @@ interface Complex {
     objectUndefined: {
         word: string
     } | undefined
+    // TODO: This doesn't work yet
+    arrayTypes: Array<string | number>
 }
